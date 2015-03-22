@@ -34,18 +34,16 @@ for i in lista_rast:
         expressao2=i+'_'+formatname+'_bin_int=int('+i+'_'+formatname+'_bin)'
         grass.mapcalc(expressao2, overwrite = True, quiet = True)
         grass.run_command('g.region',rast=i+'_'+formatname+'_bin_int')
-        grass.run_command('r.neighbors',input=i+'_'+formatname+'_bin_int',out=i+'_'+formatname+'_bin_int_dila_50m',method='maximum',size=21,overwrite = True)
-        expressao3=i+'_'+formatname+'_bin_int_dila_50m_clip=if('+i+'_'+formatname+'_bin_int>=0,'+i+'_'+formatname+'_bin_int,null())'
-        grass.mapcalc(expressao3, overwrite = True, quiet = True)
+        grass.run_command('r.neighbors',input=i+'_'+formatname+'_bin_int',out=i+'_'+formatname+'_bin_int_dila_50m',method='maximum',size=9,overwrite = True)
         cont_reclasse=cont_reclasse+1
-        
-        lista_jucao_final.append(i+'_'+formatname+'_bin_int_dila_50m_clip')
-        grass.run_command('g.remove',flags='f',rast=i+'_'+formatname+'_bin,'+i+'_'+formatname+'_bin_int_dila_50m')
-        
-    grass.run_command('r.series',input=lista_jucao_final,out=i+'_MapaHet_FINAL',overwrite = True,method='sum')
-    
+        grass.run_command('g.remove',flags='f',rast=i+'_'+formatname+'_bin')
+    lista_jucao_final=grass.mlist_grouped ('rast', pattern='*dila_50m*') ['PERMANENT'] 
+    grass.run_command('r.series',input=lista_jucao_final,out='temp',overwrite = True,method='sum')
+    expressao3=i+'_MapaHet_FINAL=int(if('+i+'>0,temp,null()))'
+    grass.mapcalc(expressao3, overwrite = True, quiet = True)  
+    grass.run_command('g.remove',flags='f',rast='temp')
     grass.run_command('r.colors',map=i+'_MapaHet_FINAL',color='wave')
-    grass.run_command('r.out.gdal',input=i+'_MapaHet_FINAL',out=i+'_MapaHet_FINAL.tif',nodata=-9999)
+    grass.run_command('r.out.gdal',input=i+'_MapaHet_FINAL',out=i+'_MapaHet_FINAL.tif')
     for rm in lista_jucao_final:
         grass.run_command('g.remove',flags='f',rast=rm)
         
