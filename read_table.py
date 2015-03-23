@@ -6,9 +6,7 @@ import math
 import csv
 import tableview
 
-#yuri
-#david
-
+#bruno
 os.chdir(r'C:\_data\vivi_brito')
 x=open('qualidade_pais.csv','rb')
 y=csv.reader(x)
